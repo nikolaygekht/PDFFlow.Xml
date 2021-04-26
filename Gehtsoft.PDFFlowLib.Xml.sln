@@ -1,0 +1,48 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30804.86
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gehtsoft.PDFFlowLib.Xml", "Gehtsoft.PDFFlowLib.Xml\Gehtsoft.PDFFlowLib.Xml.csproj", "{C4E7751E-DCCE-4A24-88E1-75543BF9870D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gehtsoft.PDFFlowLib.Xml.Test", "Gehtsoft.PDFFlowLib.Xml.Test\Gehtsoft.PDFFlowLib.Xml.Test.csproj", "{D52BDCC2-6F61-48BF-AB3A-3B3BC199BAE5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gehtsoft.PDFFlowLib.Xml.Debug", "Gehtsoft.PDFFlowLib.Xml.Debug\Gehtsoft.PDFFlowLib.Xml.Debug.csproj", "{096C2838-6364-4F84-B685-C1863F6E9747}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C323EB31-5D21-48F8-935D-2C76E2F55446}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C4E7751E-DCCE-4A24-88E1-75543BF9870D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4E7751E-DCCE-4A24-88E1-75543BF9870D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C4E7751E-DCCE-4A24-88E1-75543BF9870D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4E7751E-DCCE-4A24-88E1-75543BF9870D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D52BDCC2-6F61-48BF-AB3A-3B3BC199BAE5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D52BDCC2-6F61-48BF-AB3A-3B3BC199BAE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D52BDCC2-6F61-48BF-AB3A-3B3BC199BAE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D52BDCC2-6F61-48BF-AB3A-3B3BC199BAE5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{096C2838-6364-4F84-B685-C1863F6E9747}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{096C2838-6364-4F84-B685-C1863F6E9747}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{096C2838-6364-4F84-B685-C1863F6E9747}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{096C2838-6364-4F84-B685-C1863F6E9747}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		        SolutionGuid = {B680F395-C20A-4B39-89A6-A14FBB6D9C72}
+		                                SolutionGuid = {1DB720A6-F8F3-459A-B73B-7B427A562420}
+		                                                SolutionGuid = {08DCD22C-F051-46F7-B091-A7FA54E2A4FD}
+		                                        SolutionGuid = {AAE7D1C7-ADD5-4A4F-AE8E-445215839359}
+		                        SolutionGuid = {F8409515-AAAA-459A-8661-F651BF9FF1F1}
+		                SolutionGuid = {084C127D-4F39-4135-91D9-153B4367027D}
+		SolutionGuid = {DA46364E-E2DA-47D4-8BBB-F3339FBD3FC6}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="http://docs.gehtsoftusa.com/schemas/pdf2xsd.xsd"
+           xmlns:pdf="http://docs.gehtsoftusa.com/schemas/pdf2xsd.xsd"
+           elementFormDefault="qualified" >
+
+     <xs:simpleType name="XmlPdfStroke" final="restriction" >
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="none" />
+            <xs:enumeration value="solid" />
+            <xs:enumeration value="double" />
+            <xs:enumeration value="dash" />
+            <xs:enumeration value="dot" />
+        </xs:restriction>
+    </xs:simpleType>
+
+     <xs:simpleType name="XmlPdfListStyle" final="restriction" >
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="bullet" />
+            <xs:enumeration value="number" />
+        </xs:restriction>
+    </xs:simpleType>
+
+     <xs:simpleType name="XmlPdfListBulletStyle" final="restriction" >
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="bullet" />
+            <xs:enumeration value="dash" />
+        </xs:restriction>
+    </xs:simpleType>
+
+     <xs:simpleType name="XmlPdfListNumerationStyle" final="restriction" >
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="arabic" />
+            <xs:enumeration value="lower-latin" />
+            <xs:enumeration value="lower-roman" />
+            <xs:enumeration value="lower-cyrillic" />
+            <xs:enumeration value="upper-latin" />
+            <xs:enumeration value="upper-roman" />
+            <xs:enumeration value="upper-cyrillic" />
+        </xs:restriction>
+    </xs:simpleType>
+
+     <xs:simpleType name="XmlPdfHorizontalAlignment" final="restriction" >
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="left" />
+            <xs:enumeration value="right" />
+            <xs:enumeration value="center" />
+            <xs:enumeration value="justify" />
+        </xs:restriction>
+    </xs:simpleType>
+
+     <xs:simpleType name="XmlPdfVerticalAlignment" final="restriction" >
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="top" />
+            <xs:enumeration value="center" />
+            <xs:enumeration value="bottom" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="XmlPdfBox">
+        <xs:attribute name="left" type="xs:string" use="optional" />
+        <xs:attribute name="top" type="xs:string" use="optional" />
+        <xs:attribute name="right" type="xs:string" use="optional" />
+        <xs:attribute name="bottom" type="xs:string" use="optional" />
+    </xs:complexType>
+
+    <xs:complexType name="XmlPdfFont">
+        <xs:attribute name="name" type="xs:string" use="optional" />
+        <xs:attribute name="size" type="xs:string" use="optional" />
+        <xs:attribute name="bold" type="xs:boolean" use="optional" />
+        <xs:attribute name="italic" type="xs:boolean" use="optional" />
+        <xs:attribute name="oblique" type="xs:boolean" use="optional" />
+        <xs:attribute name="underline" type="xs:boolean" use="optional" />
+        <xs:attribute name="underline-color" type="xs:string" use="optional" />
+        <xs:attribute name="strike-through" type="xs:boolean" use="optional" />
+        <xs:attribute name="strike-through-color" type="xs:string" use="optional" />
+        <xs:attribute name="color" type="xs:string" use="optional" />
+    </xs:complexType>
+
+
+    <xs:complexType name="XmlPdfBorderSide">
+        <xs:attribute name="stroke" type="pdf:XmlPdfStroke" use="optional" />
+        <xs:attribute name="color" type="xs:string" use="optional" />
+        <xs:attribute name="width" type="xs:string" use="optional" />
+    </xs:complexType>
+
+    <xs:complexType name="XmlPdfBorder">
+        <xs:sequence>
+            <xs:element name="left" type="pdf:XmlPdfBorderSide" minOccurs="0" maxOccurs="1" />
+            <xs:element name="top" type="pdf:XmlPdfBorderSide" minOccurs="0" maxOccurs="1" />
+            <xs:element name="right" type="pdf:XmlPdfBorderSide" minOccurs="0" maxOccurs="1" />
+            <xs:element name="bottom" type="pdf:XmlPdfBorderSide" minOccurs="0" maxOccurs="1" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="XmlPdfList">
+		<xs:attribute name="style" type="pdf:XmlPdfListStyle" use="required" />
+		<xs:attribute name="bullet-style" type="pdf:XmlPdfListBulletStyle" use="optional" />
+		<xs:attribute name="numeration-style" type="pdf:XmlPdfListNumerationStyle" use="optional" />
+		<xs:attribute name="level" type="xs:integer" use="optional" />
+		<xs:attribute name="left-indent" type="xs:float" use="optional" />
+	</xs:complexType>
+
+    <xs:complexType name="XmlPdfStyle">
+        <xs:sequence>
+            <xs:element name="margin" type="pdf:XmlPdfBox" minOccurs="0" maxOccurs="1" />
+            <xs:element name="padding" type="pdf:XmlPdfBox"  minOccurs="0" maxOccurs="1" />
+            <xs:element name="font" type="pdf:XmlPdfFont"  minOccurs="0" maxOccurs="1" />
+            <xs:element name="border" type="pdf:XmlPdfBorder"  minOccurs="0" maxOccurs="1" />
+			<xs:element name="list" type="pdf:XmlPdfList"  minOccurs="0" maxOccurs="1" />
+        </xs:sequence>
+        <xs:attribute name="name" type="xs:string" use="required" />
+        <xs:attribute name="base-style" type="xs:string" use="optional" />
+        <xs:attribute name="background-color" type="xs:string" use="optional" />
+        <xs:attribute name="page-break" type="xs:boolean" use="optional" />
+        <xs:attribute name="keep-with-next" type="xs:boolean" use="optional" />
+        <xs:attribute name="horizontal-alignment" type="pdf:XmlPdfHorizontalAlignment" use="optional" />
+        <xs:attribute name="vertical-alignment" type="pdf:XmlPdfVerticalAlignment" use="optional" />
+        <xs:attribute name="line-spacing" type="xs:double" use="optional" />
+    </xs:complexType>
+
+    <xs:complexType name="XmlPdfSection">
+    </xs:complexType>
+
+    <xs:complexType name="XmlPdfStyles">
+        <xs:sequence>
+            <xs:element name="style" type="pdf:XmlPdfStyle" minOccurs="1" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="XmlPdfSections">
+        <xs:sequence>
+            <xs:element name="section" type="pdf:XmlPdfSection" minOccurs="1" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="XmlPdfDocument">
+        <xs:sequence>
+            <xs:element name="styles" type="pdf:XmlPdfStyles" minOccurs="0" maxOccurs="1" />
+            <xs:element name="sections" type="pdf:XmlPdfSections" minOccurs="1" maxOccurs="1" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:element name="document" type="pdf:XmlPdfDocument"/>
+</xs:schema>

@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <UsingTask TaskName="XSD" AssemblyFile="$(VCTargetsPath)Microsoft.Build.CPPTasks.Common.dll" />
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <LangVersion>default</LangVersion>
+    <CoreCompileDependsOn>AddGeneratedFiles;$(CoreCompileDependsOn)</CoreCompileDependsOn>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Remove="schema.xsd" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="schema.xsd" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Gehtsoft.PDFFlowLib" Version="2.1.0" />
+  </ItemGroup>
+  <Target Name="AddGeneratedFiles" DependsOnTargets="CreateGeneratedFiles" BeforeTargets="BeforeResGen">
+      <ItemGroup>
+          <Compile Include="$(IntermediateOutputPath)Schema.cs" ExcludeFromSourceAnalysis="true" />
+      </ItemGroup>
+  </Target>
+  <Target Name="CreateGeneratedFiles" Inputs="schema.xsd" Outputs="$(IntermediateOutputPath)r.cs;$(IntermediateOutputPath)pdfflow.xsd">
+      <Xsd GenerateFromSchema="classes" Language="cs" Sources="schema.xsd" Namespace="Gehtsoft.PDFFlowLib.Xml.Schema" AdditionalOptions="/out:$(IntermediateOutputPath)" />
+  </Target>
+</Project>
