@@ -6,14 +6,15 @@ using System.Threading.Tasks;
 
 namespace Gehtsoft.PDFFlowLib.Xml.Debug
 {
-    class MainTest1 : ITestScenario
+    internal class MainTest1 : ITestScenario
     {
         public void Do()
         {
             Console.WriteLine("MainTest1");
         }
     }
-    class MainTest2 
+
+    internal static class MainTest2
     {
         public static void Do()
         {

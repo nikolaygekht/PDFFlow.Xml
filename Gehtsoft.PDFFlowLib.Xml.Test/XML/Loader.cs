@@ -10,15 +10,15 @@ using System.Xml.Schema;
 using FluentAssertions;
 using Xunit;
 
-namespace Gehtsoft.PDFFlowLib.Xml.Test
+namespace Gehtsoft.PDFFlowLib.Xml.Test.Xml
 {
-    public class LoaderTest
+    public class Loader
     {
         [Fact]
         public void LoadSchema()
         {
             bool hasError = false;
-            ((Action)(() => Loader.LoadSchema((target, servery, message, exception) => { hasError = true; }))).Should().NotThrow();
+            ((Action)(() => PDFFlowLib.Xml.Loader.LoadSchema((_/* target */, _ /*severity*/, _ /*message*/, _ /*exception*/) => hasError = true))).Should().NotThrow();
             hasError.Should().BeFalse();
         }
 
@@ -27,7 +27,7 @@ namespace Gehtsoft.PDFFlowLib.Xml.Test
         {
             var doc = XmlLoader.LoadResourceAsString("InvalidDocument1");
             XmlSchemaSet schemas = new XmlSchemaSet();
-            schemas.Add(Loader.LoadSchema(null));
+            schemas.Add(PDFFlowLib.Xml.Loader.LoadSchema(null));
 
             XmlReaderSettings settings = new XmlReaderSettings()
             {
@@ -37,7 +37,7 @@ namespace Gehtsoft.PDFFlowLib.Xml.Test
             };
 
             bool fired = false;
-            settings.ValidationEventHandler += (obj, args) => { fired = true; };
+            settings.ValidationEventHandler += (obj, args) => fired = true;
 
             using var ss = new MemoryStream(Encoding.UTF8.GetBytes(doc));
             using var r = XmlReader.Create(ss, settings);
@@ -52,7 +52,7 @@ namespace Gehtsoft.PDFFlowLib.Xml.Test
         {
             var doc = XmlLoader.LoadResourceAsString("MinimumValidDocument");
             XmlSchemaSet schemas = new XmlSchemaSet();
-            schemas.Add(Loader.LoadSchema(null));
+            schemas.Add(PDFFlowLib.Xml.Loader.LoadSchema(null));
 
             XmlReaderSettings settings = new XmlReaderSettings()
             {
@@ -79,8 +79,8 @@ namespace Gehtsoft.PDFFlowLib.Xml.Test
             bool hasError = false;
             string receivedMessage = null;
             var doc = XmlLoader.LoadResourceAsString("MinimumValidDocument");
-            Schema.XmlPdfDocument document = null; 
-            ((Action)(() => document = Loader.LoadXmlPdfDocument(doc, (target, servery, message, exception) => { hasError = true; receivedMessage = message; }))).Should().NotThrow();
+            Schema.XmlPdfDocument document = null;
+            ((Action)(() => document = PDFFlowLib.Xml.Loader.LoadXmlPdfDocument(doc, (_ /*target*/, _ /*severity*/, message, _ /*exception*/) => { hasError = true; receivedMessage = message; }))).Should().NotThrow();
             hasError.Should().BeFalse($"Document excepted to be valid, but \"{receivedMessage}\" was fired.");
         }
 
@@ -90,10 +90,8 @@ namespace Gehtsoft.PDFFlowLib.Xml.Test
             bool hasError = false;
             var doc = XmlLoader.LoadResourceAsString("InvalidDocument1");
             Schema.XmlPdfDocument document = null;
-            ((Action)(() => document = Loader.LoadXmlPdfDocument(doc, (target, servery, message, exception) => { hasError = true; }))).Should().NotThrow();
+            ((Action)(() => document = PDFFlowLib.Xml.Loader.LoadXmlPdfDocument(doc, (_ /*target*/, _ /*servery*/, _ /*message*/, _ /*exception*/) => hasError = true))).Should().NotThrow();
             hasError.Should().BeTrue();
         }
     }
-
-
 }

@@ -9,7 +9,7 @@ using System.Xml.Schema;
 
 namespace Gehtsoft.PDFFlowLib.Xml.Debug
 {
-    static class Program
+    public static class Program
     {
         public static void Main(string[] args)
         {
@@ -39,11 +39,10 @@ namespace Gehtsoft.PDFFlowLib.Xml.Debug
             Console.WriteLine("The tests are:");
             foreach (var test in AllTests())
                 Console.WriteLine("  {0}", test.Name);
-
         }
 
-        private static bool HasTestInterface(Type type) => type.GetInterfaces().FirstOrDefault(@interface => @interface == typeof(ITestScenario)) != null;
-        private static MethodInfo GetDoMethod(Type type) => type.GetMethod("Do", BindingFlags.Public | BindingFlags.Static, null, new Type[] { }, null);
+        private static bool HasTestInterface(Type type) => Array.Find(type.GetInterfaces(), @interface => @interface == typeof(ITestScenario)) != null;
+        private static MethodInfo GetDoMethod(Type type) => type.GetMethod("Do", BindingFlags.Public | BindingFlags.Static, null, Array.Empty<Type>(), null);
         private static bool HasDoMethod(Type type) => GetDoMethod(type) != null;
         private static bool IsTest(Type type) => HasTestInterface(type) || HasDoMethod(type);
 

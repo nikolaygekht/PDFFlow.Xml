@@ -116,7 +116,7 @@
         <xs:attribute name="keep-with-next" type="xs:boolean" use="optional" />
         <xs:attribute name="horizontal-alignment" type="pdf:XmlPdfHorizontalAlignment" use="optional" />
         <xs:attribute name="vertical-alignment" type="pdf:XmlPdfVerticalAlignment" use="optional" />
-        <xs:attribute name="line-spacing" type="xs:double" use="optional" />
+        <xs:attribute name="line-spacing" type="xs:float" use="optional" />
     </xs:complexType>
 
     <xs:complexType name="XmlPdfSection">

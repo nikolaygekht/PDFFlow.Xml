@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Gehtsoft.PDFFlowLib.Xml.Test
 {
-    static class XmlLoader
+    internal static class XmlLoader
     {
         public static byte[] LoadResource(string name)
         {

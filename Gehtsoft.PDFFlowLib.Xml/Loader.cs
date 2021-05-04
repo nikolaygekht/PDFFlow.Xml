@@ -16,34 +16,34 @@ namespace Gehtsoft.PDFFlowLib.Xml
     /// <param name="serverty">The problem severity</param>
     /// <param name="message">The message</param>
     /// <param name="innerException">The inner exception (if any)</param>
-    public delegate void XmlPdfLoadDelegate(string location, XmlSeverityType serverty, string message, Exception innerException);
+    public delegate void XmlPdfLoadActionDelegate(string location, XmlSeverityType serverty, string message, Exception innerException);
 
+    /// <summary>
+    /// XML loader for the resources.
+    /// </summary>
     internal static class Loader
     {
         /// <summary>
         /// Loads the schema of XML to PDF file from the resources
         /// </summary>
         /// <returns></returns>
-        internal static XmlSchema LoadSchema(XmlPdfLoadDelegate errorAction)
+        internal static XmlSchema LoadSchema(XmlPdfLoadActionDelegate errorAction)
         {
             using (var stream = typeof(Loader).Assembly.GetManifestResourceStream("Gehtsoft.PDFFlowLib.Xml.schema.xsd"))
             {
                 if (stream == null)
                     throw new FileNotFoundException("The schema resource is not found (Gehtsoft.PDFFlowLib.Xml.schema.xsd)");
-                
+
                 using (var reader = new StreamReader(stream))
                 {
                     var xml = reader.ReadToEnd();
                     using var stringReader = new StringReader(xml);
-                    return XmlSchema.Read(stringReader, (obj, args) =>
-                    {
-                        errorAction?.Invoke("schema", args.Severity, args.Message, args.Exception);
-                    });
+                    return XmlSchema.Read(stringReader, (obj, args) => errorAction?.Invoke("schema", args.Severity, args.Message, args.Exception));
                 }
             }
         }
 
-        internal static XmlPdfDocument LoadXmlPdfDocument(string document, XmlPdfLoadDelegate errorAction)
+        internal static XmlPdfDocument LoadXmlPdfDocument(string document, XmlPdfLoadActionDelegate errorAction)
         {
             using MemoryStream ms = new MemoryStream(Encoding.UTF8.GetBytes(document));
             return LoadXmlPdfDocument(ms, errorAction);
@@ -55,7 +55,7 @@ namespace Gehtsoft.PDFFlowLib.Xml
         /// <param name="stream"></param>
         /// <param name="errorAction"></param>
         /// <returns></returns>
-        internal static XmlPdfDocument LoadXmlPdfDocument(Stream stream, XmlPdfLoadDelegate errorAction)
+        internal static XmlPdfDocument LoadXmlPdfDocument(Stream stream, XmlPdfLoadActionDelegate errorAction)
         {
             XmlSerializer xmlSerializer = new XmlSerializer(typeof(XmlPdfDocument));
             XmlSchemaSet schemas = new XmlSchemaSet();
@@ -70,14 +70,16 @@ namespace Gehtsoft.PDFFlowLib.Xml
             };
 
             settings.ValidationEventHandler += (obj, args) => errorAction?.Invoke("document", args.Severity, args.Message, args.Exception);
-            
+
             using XmlReader xmlReader = XmlReader.Create(stream, settings);
 
-            XmlDeserializationEvents events = new XmlDeserializationEvents();
-            events.OnUnknownAttribute = (obj, args) => errorAction?.Invoke("document", XmlSeverityType.Error, $"({args.LineNumber}:{args.LinePosition}) - Attribute expected {args.ExpectedAttributes}", null);
-            events.OnUnknownElement = (obj, args) => errorAction?.Invoke("document", XmlSeverityType.Error, $"({args.LineNumber}:{args.LinePosition}) - Elements expected {args.ExpectedElements}", null);
-            events.OnUnknownNode = (obj, args) => errorAction?.Invoke("document", XmlSeverityType.Error, $"({args.LineNumber}:{args.LinePosition}) - Unknown node {args.Name}", null);
-            events.OnUnreferencedObject = (obj, args) => errorAction?.Invoke("document", XmlSeverityType.Error, $"Unreferenced object {args.UnreferencedId}", null);
+            XmlDeserializationEvents events = new XmlDeserializationEvents
+            {
+                OnUnknownAttribute = (obj, args) => errorAction?.Invoke("document", XmlSeverityType.Error, $"({args.LineNumber}:{args.LinePosition}) - Attribute expected {args.ExpectedAttributes}", null),
+                OnUnknownElement = (obj, args) => errorAction?.Invoke("document", XmlSeverityType.Error, $"({args.LineNumber}:{args.LinePosition}) - Elements expected {args.ExpectedElements}", null),
+                OnUnknownNode = (obj, args) => errorAction?.Invoke("document", XmlSeverityType.Error, $"({args.LineNumber}:{args.LinePosition}) - Unknown node {args.Name}", null),
+                OnUnreferencedObject = (obj, args) => errorAction?.Invoke("document", XmlSeverityType.Error, $"Unreferenced object {args.UnreferencedId}", null)
+            };
 
             return xmlSerializer.Deserialize(xmlReader, events) as XmlPdfDocument;
         }
