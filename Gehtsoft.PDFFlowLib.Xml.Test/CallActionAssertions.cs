@@ -189,6 +189,25 @@ namespace Gehtsoft.PDFFlowLib.Xml.Test
         }
 
         /// <summary>
+        /// Asserts whether the parameter at the specified index has the value matching the predicate specified
+        /// </summary>
+        /// <param name="parameter"></param>
+        /// <param name="predicate"></param>
+        /// <param name="because"></param>
+        /// <param name="becauseParameters"></param>
+        /// <returns></returns>
+        public AndConstraint<CallActionAssertions> HaveParameterN<T>(int parameter, Func<T, bool> predicate, string because = null, params object[] becauseParameters)
+        {
+            Execute.Assertion
+                .BecauseOf(because, becauseParameters)
+                .Given(() => Subject)
+                .ForCondition(action => action.Parameters[parameter] is T t && predicate(t))
+                .FailWith("Expected {context:action} has {0}th parameter matches the predicate but it does not.", parameter);
+
+            return new AndConstraint<CallActionAssertions>(this);
+        }
+
+        /// <summary>
         /// Asserts whether the parameter at the index specified is a variable reference
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -341,6 +360,42 @@ namespace Gehtsoft.PDFFlowLib.Xml.Test
                     .BecauseOf(because, becauseParameters)
                     .ForCondition(any)
                     .FailWith("Expected {context:action} has a parameter referring to variable {0} of type {1} but it doesn't have.", name, typeof(T).Name);
+            return new AndConstraint<CallActionAssertions>(this);
+        }
+
+        /// <summary>
+        /// Asserts the action calls any static method of type
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="name"></param>
+        /// <param name="because"></param>
+        /// <param name="becauseParameters"></param>
+        /// <returns></returns>
+        public AndConstraint<CallActionAssertions> CallAnyOf<T>(string because = null, params object[] becauseParameters)
+        {
+            Execute.Assertion
+                    .BecauseOf(because, becauseParameters)
+                    .Given(() => Subject)
+                    .ForCondition(action => action.TargetType == typeof(T))
+                    .FailWith("Expected {context:action} call a method of type {0} but it doesn't have.", typeof(T).Name);
+            return new AndConstraint<CallActionAssertions>(this);
+        }
+
+        /// <summary>
+        /// Asserts the action calls any static method of type
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="name"></param>
+        /// <param name="because"></param>
+        /// <param name="becauseParameters"></param>
+        /// <returns></returns>
+        public AndConstraint<CallActionAssertions> CallAnyOf(string variableName, string because = null, params object[] becauseParameters)
+        {
+            Execute.Assertion
+                    .BecauseOf(because, becauseParameters)
+                    .Given(() => Subject)
+                    .ForCondition(action => action.Target == variableName)
+                    .FailWith("Expected {context:action} call a method of type {0} but it doesn't have.", variableName);
             return new AndConstraint<CallActionAssertions>(this);
         }
     }

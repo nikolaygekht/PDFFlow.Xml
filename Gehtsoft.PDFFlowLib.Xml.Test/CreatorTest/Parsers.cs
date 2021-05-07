@@ -4,11 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Gehtsoft.PDFFlow.Models.Enumerations;
+using Gehtsoft.PDFFlow.Models.Shared;
 using Xunit;
 
 namespace Gehtsoft.PDFFlowLib.Xml.Test.CreatorTest
 {
-    public class ColorParser
+    public class Parsers
     {
         [Theory]
         [InlineData("#000000", 0x0, 0x0, 0x0)]
@@ -35,10 +37,38 @@ namespace Gehtsoft.PDFFlowLib.Xml.Test.CreatorTest
         [Theory]
         [InlineData("greey")]
         [InlineData("#aa")]
+        [InlineData("agreyx")]
+        [InlineData("xx#012345xx")]
         [InlineData("#aabbxx")]
         public void IncorrectColor(string color)
         {
             ((Action)(() => Creator.ParseColor(color))).Should().Throw<ArgumentException>();
         }
+
+        [Theory]
+        [InlineData("0", 0f, MeasurementUnit.Point)]
+        [InlineData("0cm", 0f, MeasurementUnit.Centimeter)]
+        [InlineData("1pt", 1f, MeasurementUnit.Point)]
+        [InlineData("-1px", -1f, MeasurementUnit.Pixel)]
+        [InlineData("-1.23mm", -1.23f, MeasurementUnit.Millimeter)]
+        [InlineData("15.75cm", 15.75f, MeasurementUnit.Centimeter)]
+        public void CorrectUnit(string text, float n, MeasurementUnit unit)
+        {
+            XUnit u = Creator.ParseUnit(text);
+            u.Value.Should().Be(n);
+            u.Type.Should().Be(unit);
+        }
+
+        [Theory]
+        [InlineData("pt")]
+        [InlineData("1")]
+        [InlineData("x1pt")]
+        [InlineData("cm1")]
+        public void IncorrectUnit(string text)
+        {
+            ((Action)(() => Creator.ParseColor(text))).Should().Throw<ArgumentException>();
+        }
     }
 }
+
+

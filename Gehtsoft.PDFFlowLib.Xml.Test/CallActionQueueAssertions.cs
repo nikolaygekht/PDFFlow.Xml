@@ -192,5 +192,47 @@ namespace Gehtsoft.PDFFlowLib.Xml.Test
                 .FailWith(message);
             return new AndConstraint<CallActionQueueAssertions>(this);
         }
+
+        /// <summary>
+        /// Checks whether the queue does not have any action which passes assertions defined.
+        /// in the specified lambda expression.
+        /// </summary>
+        /// <param name="checkAction"></param>
+        /// <param name="because"></param>
+        /// <param name="becauseParameters"></param>
+        /// <returns></returns>
+        public AndConstraint<CallActionQueueAssertions> HaveNoActions(Action<CallAction> checkAction, string because = null, params object[] becauseParameters)
+        {
+            bool any = false;
+            int index = -1;
+            int skip = Skip;
+            foreach (var action in Subject)
+            {
+                index++;
+                if (skip > 0)
+                {
+                    skip--;
+                    continue;
+                }
+
+                try
+                {
+                    checkAction(action);
+                    any = true;
+                }
+                catch (XunitException) { /* suppress assertion */ }
+            }
+            string message;
+            if (Skip > 0)
+                message = $"Expected {{context:actions}} contains the action specified after element {Skip - 1}, but it does not";
+            else
+                message = "Expected {context:actions} contains the action specified, but it does not";
+
+            Execute.Assertion
+                .BecauseOf(because, becauseParameters)
+                .ForCondition(!any)
+                .FailWith(message);
+            return new AndConstraint<CallActionQueueAssertions>(this);
+        }
     }
 }

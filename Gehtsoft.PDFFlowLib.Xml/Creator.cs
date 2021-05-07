@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -94,98 +95,36 @@ namespace Gehtsoft.PDFFlowLib.Xml
             return actions;
         }
 
-        private static void HandleStyle(Queue<CallAction> actions, XmlPdfStyle style)
+        internal static void HandleFontBuilder(XmlPdfFont font, Queue<CallAction> actions, string fontBuilderName)
         {
-            CallAction action;
+            actions.Let<FontBuilder>(fontBuilderName, null, _ => FontBuilder.New());
+            if (!string.IsNullOrEmpty(font.name))
+                actions.Call<FontBuilder>(fontBuilderName, builder => builder.SetName(font.name));
+            if (!string.IsNullOrEmpty(font.encoding))
+                actions.Call<FontBuilder>(fontBuilderName, builder => builder.SetEncodingName(font.encoding));
+            if (!string.IsNullOrEmpty(font.size))
+                actions.Call<FontBuilder>(fontBuilderName, builder => builder.SetSize(ParseUnit(font.size).Point));
+            if (!string.IsNullOrEmpty(font.color))
+                actions.Call<FontBuilder>(fontBuilderName, builder => builder.SetColor(ParseColor(font.color)));
+            if (font.boldSpecified)
+                actions.Call<FontBuilder>(fontBuilderName, builder => builder.SetBold(font.bold));
+            if (font.italicSpecified)
+                actions.Call<FontBuilder>(fontBuilderName, builder => builder.SetItalic(font.italic));
+            if (font.obliqueSpecified)
+                actions.Call<FontBuilder>(fontBuilderName, builder => builder.SetOblique(font.oblique));
 
-            //create a style
-            var builderName = $"{style.name}_styleBuilder";
-            if (string.IsNullOrEmpty(style.basestyle))
+            if (font.underlineSpecified && font.underline)
             {
-                action = CallAction.Let<StyleBuilder>(builderName, null, _ => StyleBuilder.New(null));
-                actions.Enqueue(action);
-            }
-            else
-            {
-                var parentName = $"{style.basestyle}_styleBuilder";
-                action = CallAction.Let<StyleBuilder>(builderName, null, _ => StyleBuilder.New((new Variable<StyleBuilder>(parentName)).Value));
-                actions.Enqueue(action);
-            }
-
-            if (style.backgroundcolor != null)
-            {
-                var color = ParseColor(style.backgroundcolor);
-                action = CallAction.Call<StyleBuilder>(builderName, builder => builder.SetBackColor(color));
-                actions.Enqueue(action);
-            }
-
-            if (style.pagebreakSpecified)
-            {
-                action = CallAction.Call<StyleBuilder>(builderName, builder => builder.SetPageBreak(style.pagebreak ? PageBreak.NextPage : PageBreak.InFlow));
-                actions.Enqueue(action);
+                actions.Call<FontBuilder>(fontBuilderName, builder => builder.SetUnderline());
+                if (!string.IsNullOrEmpty(font.underlinecolor))
+                    actions.Call<FontBuilder>(fontBuilderName, builder => builder.SetUnderlineColor(ParseColor(font.underlinecolor)));
             }
 
-            if (style.keepwithnextSpecified)
+            if (font.strikethroughSpecified && font.strikethrough)
             {
-                action = CallAction.Call<StyleBuilder>(builderName, builder => builder.SetKeepWithNext(style.keepwithnext));
-                actions.Enqueue(action);
-            }
-
-            if (style.horizontalalignmentSpecified)
-            {
-                HorizontalAlignment alignment = style.horizontalalignment switch
-                {
-                    XmlPdfHorizontalAlignment.left => HorizontalAlignment.Left,
-                    XmlPdfHorizontalAlignment.center => HorizontalAlignment.Center,
-                    XmlPdfHorizontalAlignment.right => HorizontalAlignment.Right,
-                    XmlPdfHorizontalAlignment.justify => HorizontalAlignment.Left,
-                    _ => throw new InvalidDataException($"Horizontal alignment value {style.horizontalalignment} is not supported")
-                };
-
-                action = CallAction.Call<StyleBuilder>(builderName, builder => builder.SetHorizontalAlignment(alignment));
-                actions.Enqueue(action);
-
-                action = CallAction.Call<StyleBuilder>(builderName, builder => builder.SetJustifyAlignment(style.horizontalalignment == XmlPdfHorizontalAlignment.justify));
-                actions.Enqueue(action);
-            }
-
-            if (style.verticalalignmentSpecified)
-            {
-                VerticalAlignment alignment = style.verticalalignment switch
-                {
-                    XmlPdfVerticalAlignment.top => VerticalAlignment.Top,
-                    XmlPdfVerticalAlignment.center => VerticalAlignment.Center,
-                    XmlPdfVerticalAlignment.bottom => VerticalAlignment.Bottom,
-                    _ => throw new InvalidDataException($"Vertical alignment value {style.horizontalalignment} is not supported")
-                };
-
-                action = CallAction.Call<StyleBuilder>(builderName, builder => builder.SetVerticalAlignment(alignment));
-                actions.Enqueue(action);
-            }
-
-            if (style.linespacingSpecified)
-            {
-                action = CallAction.Call<StyleBuilder>(builderName, builder => builder.SetLineSpacing(style.linespacing));
-                actions.Enqueue(action);
-            }
-        }
-
-        private readonly static Regex gColorValidator = new Regex("#[0-9a-fA-F]{6}");
-
-        internal static Color ParseColor(string color)
-        {
-            if (color.StartsWith("#"))
-            {
-                if (!gColorValidator.IsMatch(color))
-                    throw new ArgumentException($"Color {color} is not a correct HTML color", nameof(color));
-                return Color.FromHtml(color);
-            }
-            else
-            {
-                var colors = ColorDictionary.Instance;
-                if (colors.IsDefined(color))
-                    return colors[color];
-                throw new ArgumentException($"Color {color} name is not know", nameof(color));
+                actions.Call<FontBuilder>(fontBuilderName, builder => builder.SetStrikethrough());
+                if (!string.IsNullOrEmpty(font.strikethroughcolor))
+                    actions.Call<FontBuilder>(fontBuilderName, builder => builder.SetStrikethroughColor(ParseColor(font.strikethroughcolor)));
             }
         }
     }

@@ -8,6 +8,8 @@ namespace Gehtsoft.PDFFlowLib.Xml.Actions
     /// <typeparam name="T"></typeparam>
     internal class Variable<T> : Variable
     {
+        public static Variable<T> Ref(string name) => new Variable<T>(name);
+
         public Variable(string name) : base(name)
         {
         }
