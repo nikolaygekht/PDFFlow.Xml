@@ -172,13 +172,11 @@ namespace Gehtsoft.PDFFlowLib.Xml.Test
                 }
                 catch (XunitException) { /* suppress assertion */ }
 
-#pragma warning disable S2589 // Boolean expressions should not be gratuitous: False positive
                 if (any)
                 {
                     LastFoundAt = index;
                     break;
                 }
-#pragma warning restore S2589 // Boolean expressions should not be gratuitous            }
             }
             string message;
             if (Skip > 0)

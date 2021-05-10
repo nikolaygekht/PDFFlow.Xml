@@ -42,7 +42,7 @@
         </xs:restriction>
     </xs:simpleType>
 
-     <xs:simpleType name="XmlPdfListNumerationStyle" final="restriction" >
+     <xs:simpleType name="XmlPdfNumerationStyle" final="restriction" >
         <xs:restriction base="xs:string">
             <xs:enumeration value="arabic" />
             <xs:enumeration value="lower-latin" />
@@ -125,7 +125,7 @@
     <xs:complexType name="XmlPdfList">
 		<xs:attribute name="style" type="pdf:XmlPdfListStyle" use="required" />
 		<xs:attribute name="bullet-style" type="pdf:XmlPdfListBulletStyle" use="optional" />
-		<xs:attribute name="numeration-style" type="pdf:XmlPdfListNumerationStyle" use="optional" />
+		<xs:attribute name="numeration-style" type="pdf:XmlPdfNumerationStyle" use="optional" />
 		<xs:attribute name="level" type="xs:int" use="optional" />
 		<xs:attribute name="left-indent" type="xs:float" use="optional" />
 	</xs:complexType>
@@ -151,7 +151,81 @@
 		<xs:attribute name="min-cell-height" type="pdf:XmlPdfUnit" use="optional" />
     </xs:complexType>
 
+	<xs:simpleType name="XmlPdfPageSize" final="restriction" >
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="custom" />
+			<xs:enumeration value="A0" />
+			<xs:enumeration value="A1" />
+			<xs:enumeration value="A2" />
+			<xs:enumeration value="A3" />
+			<xs:enumeration value="A4" />
+			<xs:enumeration value="A5" />
+			<xs:enumeration value="half-letter" />
+			<xs:enumeration value="junior-legal" />
+			<xs:enumeration value="legal" />
+			<xs:enumeration value="letter" />
+			<xs:enumeration value="ledger" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="XmlPdfPageOrientation" final="restriction" >
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="portrait" />
+			<xs:enumeration value="landscape" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="XmlPdfPageSide" final="restriction" >
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="odd" />
+			<xs:enumeration value="even" />
+			<xs:enumeration value="single" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="XmlPdfAreaType" final="restriction" >
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="header" />
+			<xs:enumeration value="footer" />
+			<xs:enumeration value="flow" />
+			<xs:enumeration value="fixed" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:complexType name="XmlPdfPage">
+		<xs:attribute name="size" type="pdf:XmlPdfPageSize" default="letter" />
+		<xs:attribute name="width" type="pdf:XmlPdfUnit" use="optional" />
+		<xs:attribute name="height" type="pdf:XmlPdfUnit" use="optional" />
+		<xs:attribute name="orientation" type="pdf:XmlPdfPageOrientation" default="portrait" />
+	</xs:complexType>
+
+	<xs:complexType name="XmlPdfPageArea">
+		<xs:sequence>
+			<xs:element name="location" type="pdf:XmlPdfBox" minOccurs="0" maxOccurs="1" />
+		</xs:sequence>
+		<xs:attribute name="type" type="pdf:XmlPdfAreaType" default="flow" />
+		<xs:attribute name="page" type="pdf:XmlPdfPageSide" default="single" />
+		<xs:attribute name="height" type="pdf:XmlPdfUnit" use="optional" />
+	</xs:complexType>
+	
+	<xs:complexType name="XmlPdfPageNumeration">
+		<xs:attribute name="type" type="pdf:XmlPdfNumerationStyle" />
+		<xs:attribute name="start-from" type="xs:int" use="optional" />
+	</xs:complexType>
+	
+	<xs:complexType name="XmlPdfLayout">
+		<xs:sequence>
+			<xs:element name="page" type="pdf:XmlPdfPage" minOccurs="1" maxOccurs="1" />
+			<xs:element name="margins" type="pdf:XmlPdfBox" minOccurs="0" maxOccurs="1" />
+			<xs:element name="page-numeration" type="pdf:XmlPdfPageNumeration" minOccurs="0" maxOccurs="1" />
+			<xs:element name="area"	 type="pdf:XmlPdfPageArea" minOccurs="1" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
     <xs:complexType name="XmlPdfSection">
+		<xs:sequence>
+			<xs:element name="layout" type="pdf:XmlPdfLayout" minOccurs="1" maxOccurs="1" />
+		</xs:sequence>
     </xs:complexType>
 
     <xs:complexType name="XmlPdfStyles">
@@ -169,7 +243,7 @@
     <xs:complexType name="XmlPdfDocument">
         <xs:sequence>
             <xs:element name="styles" type="pdf:XmlPdfStyles" minOccurs="0" maxOccurs="1" />
-            <xs:element name="sections" type="pdf:XmlPdfSections" minOccurs="1" maxOccurs="1" />
+            <xs:element name="sections" type="pdf:XmlPdfSections" minOccurs="0" maxOccurs="1" />
         </xs:sequence>
     </xs:complexType>
 

@@ -17,10 +17,14 @@ namespace Gehtsoft.PDFFlowLib.Xml.Test.CreatorTest
     {
         private static XmlPdfDocument ModelOf(string styleElements)
         {
-            var doc = XmlLoader.LoadResourceAsString("MinimumValidDocument");
-            doc = doc.Replace("<sections>",
-                $"<styles>{styleElements}</styles><sections>");
-            return Loader.LoadXmlPdfDocument(doc, null);
+            StringBuilder builder = new StringBuilder();
+            builder
+                .Append("<document xmlns='http://docs.gehtsoftusa.com/schemas/pdf2xsd.xsd'>")
+                .Append("<styles>")
+                .Append(styleElements)
+                .Append("</styles>")
+                .Append("</document>");
+            return Loader.LoadXmlPdfDocument(builder.ToString(), null);
         }
 
         [Fact]
@@ -255,7 +259,7 @@ namespace Gehtsoft.PDFFlowLib.Xml.Test.CreatorTest
                     nameof(StyleBuilder.SetBorderBottom), 1.23f, MeasurementUnit.Inch, Stroke.Solid,
                                                     null, null, null)]
 
-        public void Border(string side, string method, float? u, MeasurementUnit? t, Stroke ?s, byte? r, byte ?g, byte ?b)
+        public void Border(string side, string method, float? u, MeasurementUnit? t, Stroke? s, byte? r, byte? g, byte? b)
         {
             var model = ModelOf($"<style name='style1'><border><{side}/></border></style>");
             var actions = Creator.Compile(model);
@@ -304,7 +308,7 @@ namespace Gehtsoft.PDFFlowLib.Xml.Test.CreatorTest
             var model = ModelOf($"<style name='style1'><font {font}/></style>");
             var actions = Creator.Compile(model);
             const string style1Builder = "style1_styleBuilder";
-            string fontBuilder = $"{style1Builder}_font";
+            const string fontBuilder = style1Builder + "_font";
 
             actions.Should()
                 .HaveAction(action => action.Should().SaveTo(fontBuilder)

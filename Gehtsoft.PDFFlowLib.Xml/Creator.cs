@@ -76,7 +76,7 @@ namespace Gehtsoft.PDFFlowLib.Xml
             if (mDocumentBuilder != null)
                 mDocumentBuilder = DocumentBuilder.New();
             Variables variables = new Variables();
-            variables["builder"] = mDocumentBuilder;
+            variables["documentBuilder"] = mDocumentBuilder;
 
             var actions = Compile(document);
 
@@ -91,6 +91,10 @@ namespace Gehtsoft.PDFFlowLib.Xml
             if (document.styles != null)
                 foreach (var style in document.styles)
                     HandleStyle(actions, style);
+
+            if (document.sections != null)
+                foreach (var section in document.sections)
+                    HandleSection(actions, section);
 
             return actions;
         }
