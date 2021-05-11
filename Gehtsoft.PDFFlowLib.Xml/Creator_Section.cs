@@ -23,11 +23,15 @@ namespace Gehtsoft.PDFFlowLib.Xml
         {
             actions.Let<SectionBuilder>(SECTIONBUILDER, null, _ => SectionBuilder.New((new Variable<DocumentBuilder>("documentBuilder")).Value));
 
+            if (section.applystyle?.Length > 0)
+                foreach (var style in section.applystyle)
+                    HandleSectionStyle(actions, style);
+
             if (section.layout != null)
-                HandleLayout(actions, section.layout);
+                HandleSectionLayout(actions, section.layout);
         }
 
-        private static void HandleLayout(Queue<CallAction> actions, XmlPdfLayout layout)
+        private static void HandleSectionLayout(Queue<CallAction> actions, XmlPdfLayout layout)
         {
             HandlePage(actions, layout.page);
 
@@ -40,6 +44,31 @@ namespace Gehtsoft.PDFFlowLib.Xml
             if (layout.area?.Length > 0)
                 foreach (var area in layout.area)
                     HandleArea(actions, area);
+        }
+
+        private static void HandleSectionStyle(Queue<CallAction> actions, XmlPdfStyleReference reference)
+        {
+            var styleBuilder = $"{reference.name}_styleBuilder";
+            switch (reference.target)
+            {
+                case XmlPdfStyleReferenceTarget.paragraph:
+                    actions.Call<SectionBuilder>(SECTIONBUILDER, builder => builder.SetParagraphStyle(Variable<StyleBuilder>.Ref(styleBuilder).Value));
+                    break;
+                case XmlPdfStyleReferenceTarget.image:
+                    actions.Call<SectionBuilder>(SECTIONBUILDER, builder => builder.SetImageStyle(Variable<StyleBuilder>.Ref(styleBuilder).Value));
+                    break;
+                case XmlPdfStyleReferenceTarget.table:
+                    actions.Call<SectionBuilder>(SECTIONBUILDER, builder => builder.SetTableStyle(Variable<StyleBuilder>.Ref(styleBuilder).Value));
+                    break;
+                case XmlPdfStyleReferenceTarget.line:
+                    actions.Call<SectionBuilder>(SECTIONBUILDER, builder => builder.SetLineStyle(Variable<StyleBuilder>.Ref(styleBuilder).Value));
+                    break;
+                case XmlPdfStyleReferenceTarget.@object:
+                    actions.Call<SectionBuilder>(SECTIONBUILDER, builder => builder.ApplyStyle(Variable<StyleBuilder>.Ref(styleBuilder).Value));
+                    break;
+                default:
+                    throw new ArgumentException($"Unsupported style target {reference.target}");
+            }
         }
 
         private static void HandlePageNumeration(Queue<CallAction> actions, XmlPdfPageNumeration pageNumeration)

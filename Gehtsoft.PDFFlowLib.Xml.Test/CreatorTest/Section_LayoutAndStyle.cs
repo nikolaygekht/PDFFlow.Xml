@@ -13,19 +13,19 @@ using Xunit;
 
 namespace Gehtsoft.PDFFlowLib.Xml.Test.CreatorTest
 {
-    public class Layout
+    public class Section_LayoutAndStyle
     {
         private const string SECTIONBUILDER = "sectionBuilder";
         private const string AREABUILDER = "areaBuilder";
 
-        private static XmlPdfDocument ModelOf(string styleElements)
+        private static XmlPdfDocument ModelOf(string sectionElements)
         {
             StringBuilder builder = new StringBuilder();
             builder
                 .Append("<document xmlns='http://docs.gehtsoftusa.com/schemas/pdf2xsd.xsd'>")
                 .Append("<sections>")
                 .Append("<section>")
-                .Append(styleElements)
+                .Append(sectionElements)
                 .Append("</section>")
                 .Append("</sections>")
                 .Append("</document>");
@@ -135,6 +135,82 @@ namespace Gehtsoft.PDFFlowLib.Xml.Test.CreatorTest
                                         box.Right.IsWithinMMFrom(_right) &&
                                         box.Top.IsWithinMMFrom(_top) &&
                                         box.Bottom.IsWithinMMFrom(_bottom)));
+        }
+
+        [Theory]
+        [InlineData("type='header' height='1in'", nameof(SectionBuilder.AddHeaderToBothPages), "1in")]
+        [InlineData("type='footer' height='1in'", nameof(SectionBuilder.AddFooterToBothPages), "1in")]
+        [InlineData("type='footer' height='1in' page='single'", nameof(SectionBuilder.AddFooterToBothPages), "1in")]
+        [InlineData("type='header' height='15mm' page='odd'", nameof(SectionBuilder.AddHeaderToOddPage), "15mm")]
+        [InlineData("type='header' height='15mm' page='even'", nameof(SectionBuilder.AddHeaderToEvenPage), "15mm")]
+        [InlineData("type='footer' height='25mm' page='odd'", nameof(SectionBuilder.AddFooterToOddPage), "25mm")]
+        [InlineData("type='footer' height='25mm' page='even'", nameof(SectionBuilder.AddFooterToEvenPage), "25mm")]
+        public void AreaDefinedByHeight(string areaSpec, string method, string height)
+        {
+            var model = ModelOf($"<layout><page size='A4' /><area {areaSpec}/></layout>");
+            var actions = Creator.Compile(model);
+
+            XUnit _height = Creator.ParseUnit(height);
+            
+            actions.Should()
+                    .HaveAction(action => action.Should()
+                                    .CallInstance(SECTIONBUILDER, method)
+                                    .And
+                                    .HaveParameterN<float>(0, v =>
+                                        v.IsWithinMMFrom(_height.Point)));
+
+        }
+
+        [Theory]
+        [InlineData("type='flow'", "left='1in' top='2in' right='5in' bottom='7in'", nameof(SectionBuilder.AddDocumentFlowAreaToBothPages), "1in", "2in", "4in", "5in")]
+        [InlineData("type='flow' page='single'", "left='1in' top='2in' right='5in' bottom='7in'", nameof(SectionBuilder.AddDocumentFlowAreaToBothPages), "1in", "2in", "4in", "5in")]
+        [InlineData("type='flow' page='odd'", "left='1in' top='2in' right='5in' bottom='7in'", nameof(SectionBuilder.AddDocumentFlowAreaToOddPage), "1in", "2in", "4in", "5in")]
+        [InlineData("type='flow' page='even'", "left='10mm' top='20mm' right='50mm' bottom='70mm'", nameof(SectionBuilder.AddDocumentFlowAreaToEvenPage), "10mm", "20mm", "40mm", "50mm")]
+        public void AreaDefinedByPosition(string areaSpec, string position, string method, string left, string top, string width, string height)
+        {
+            var model = ModelOf($"<layout><page size='A4' /><area {areaSpec}><location {position} /></area></layout>");
+            var actions = Creator.Compile(model);
+
+            XUnit _left, _top, _height, _width;
+
+            _left = Creator.ParseUnit(left);
+            _top = Creator.ParseUnit(top);
+            _height = Creator.ParseUnit(height);
+            _width = Creator.ParseUnit(width);
+
+            actions.Should()
+                .HaveAction(action => action.Should()
+                        .CallInstance(SECTIONBUILDER, method)
+                        .And
+                        .HaveParameterN<float>(0, v =>
+                            v.IsWithinMMFrom(_left.Point))
+                        .And
+                        .HaveParameterN<float>(1, v =>
+                            v.IsWithinMMFrom(_top.Point))
+                        .And
+                        .HaveParameterN<float>(2, v =>
+                            v.IsWithinMMFrom(_width.Point))
+                        .And
+                        .HaveParameterN<float>(3, v =>
+                            v.IsWithinMMFrom(_height.Point))
+                        );
+        }
+
+        [Theory]
+        [InlineData("paragraph", nameof(SectionBuilder.SetParagraphStyle), "name1")]
+        [InlineData("image", nameof(SectionBuilder.SetImageStyle), "name2")]
+        [InlineData("table", nameof(SectionBuilder.SetTableStyle), "name3")]
+        [InlineData("line", nameof(SectionBuilder.SetLineStyle), "name4")]
+        public void ApplyStyle(string target, string methodName, string styleName)
+        {
+            var model = ModelOf($"<apply-style name='{styleName}' target='{target}' /><layout><page size='letter' /><area type='header' height='1in'/></layout>");
+            var actions = Creator.Compile(model);
+
+            actions.Should()
+                .HaveAction(action => action.Should()
+                                            .CallInstance(SECTIONBUILDER, methodName)
+                                            .And
+                                            .HaveVariableParameterN<StyleBuilder>(0, $"{styleName}_styleBuilder"));
         }
     }
 }

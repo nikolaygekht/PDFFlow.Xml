@@ -212,6 +212,21 @@
 		<xs:attribute name="type" type="pdf:XmlPdfNumerationStyle" />
 		<xs:attribute name="start-from" type="xs:int" use="optional" />
 	</xs:complexType>
+
+	<xs:simpleType name="XmlPdfStyleReferenceTarget" final="restriction" >
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="object" />
+			<xs:enumeration value="paragraph" />
+			<xs:enumeration value="table" />
+			<xs:enumeration value="image" />
+			<xs:enumeration value="line" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:complexType name="XmlPdfStyleReference">
+		<xs:attribute name="name" type="xs:string" />
+		<xs:attribute name="target" type="pdf:XmlPdfStyleReferenceTarget" default="object" />
+	</xs:complexType>
 	
 	<xs:complexType name="XmlPdfLayout">
 		<xs:sequence>
@@ -224,6 +239,7 @@
 
     <xs:complexType name="XmlPdfSection">
 		<xs:sequence>
+			<xs:element name="apply-style" type="pdf:XmlPdfStyleReference" minOccurs="0" maxOccurs="unbounded" />
 			<xs:element name="layout" type="pdf:XmlPdfLayout" minOccurs="1" maxOccurs="1" />
 		</xs:sequence>
     </xs:complexType>
